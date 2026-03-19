@@ -605,7 +605,6 @@ button {
     font-weight: 300;
     letter-spacing: 0.5px;
 }
-/* GRID PRINCIPAL - 2 COLUNAS MOBILE */
 /* Grid de produtos: 2 colunas no celular, 4/5 colunas no PC */
 .products-grid {
     display: grid;

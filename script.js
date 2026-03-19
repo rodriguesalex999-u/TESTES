@@ -24,7 +24,7 @@ let searchQuery = '';
 
 // Variáveis para Lazy Loading - Mobile first: 6 produtos
 let currentPage = 1;
-let productsPerPage = 6; // Número par perfeito para vitrine de 2 colunas no celular
+let productsPerPage = 12; // Aumentado para 12 para garantir que o sensor saia da tela inicial
 let hasMoreProducts = true;
 let isLoadingMore = false;
 let allProductsLoaded = [];
@@ -663,22 +663,14 @@ function setupInfiniteScroll() {
     if (!trigger) return;
 
     const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            
-            // Se for a aba "Todos", carrega mais produtos
-            if (currentCategory === 'all' && !isLoadingMore && hasMoreProducts) {
-                console.log('📱 Carregando mais produtos...');
+        // Se o sensor aparecer na tela e não estivermos carregando nada...
+        if (entries[0].isIntersecting && !isLoadingMore && hasMoreProducts) {
+            if (currentCategory === 'all') {
                 loadProducts(false);
-            }
-            
-            // Se for uma categoria específica, mostra as sugestões
-            if (currentCategory !== 'all') {
-                console.log('📱 Final da categoria, mostrando sugestões...');
-                showEndCategorySuggestions();
             }
         }
     }, {
-        rootMargin: '400px'
+        rootMargin: '100px' // Sensibilidade ajustada
     });
 
     observer.observe(trigger);
