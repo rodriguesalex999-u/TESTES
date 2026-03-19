@@ -868,10 +868,11 @@ async function openProductModal(id) {
     const viewersCount = Math.floor(Math.random() * 9) + 4;
 
     const thumbnailsHtml = currentMediaList.map((media, index) => `
-        <div class="modal-thumb ${media.type === 'video' ? 'video-thumb' : ''} ${index === 0 ? 'active' : ''}" onclick="changeModalMedia(${index})">
-            <img src="${media.thumbnail}" alt="">
-        </div>
-    `).join('');
+    <div class="modal-thumb ${media.type === 'video' ? 'video-thumb' : ''} ${index === 0 ? 'active' : ''}" onclick="changeModalMedia(${index})">
+        <img src="${media.thumbnail}" alt="">
+        ${index === 0 && product.badge_text ? `<span class="thumb-badge">${product.badge_text}</span>` : ''}
+    </div>
+`).join('');
 
     const solitarioHtml = product.tem_solitario && product.solitario_price > 0 ? `
         <div class="solitario-discreto">
@@ -880,13 +881,15 @@ async function openProductModal(id) {
     ` : '';
 
     const modalHtml = `
-        <div class="modal-gallery">
-            <div class="modal-main-media" id="modalMainMedia">
-                ${currentMediaList[0]?.type === 'video'
-                    ? `<video src="${currentMediaList[0].url}" autoplay muted loop playsinline></video>`
-                    : `<img src="${currentMediaList[0]?.url || ''}" alt="${product.name}">`}
-            </div>
+    <div class="modal-gallery">
+        <div class="modal-main-media" id="modalMainMedia" style="position: relative;">
+            ${currentMediaList[0]?.type === 'video'
+                ? `<video src="${currentMediaList[0].url}" autoplay muted loop playsinline></video>`
+                : `<img src="${currentMediaList[0]?.url || ''}" alt="${product.name}">`}
+            ${product.badge_text ? `<div class="product-badge modal-badge">${product.badge_text}</div>` : ''}
+            ${product.sold_today ? `<div class="product-sold-today modal-sold-today">Vendido Hoje</div>` : ''}
         </div>
+    </div>
         <div class="modal-thumbnails">${thumbnailsHtml}</div>
         <div class="modal-info">
             <span class="modal-category">${product.categories?.name || ''}</span>
@@ -1119,10 +1122,41 @@ function renderSuperZoomMedia() {
     
     let mediaHTML = '';
     if (currentMedia.type === 'video') {
-        mediaHTML = `<video src="${currentMedia.url}" controls autoplay loop playsinline style="max-width:100%;max-height:90vh;object-fit:contain;"></video>`;
+    mediaHTML = `<video src="${currentMedia.url}" controls autoplay loop playsinline style="max-width:100%;max-height:90vh;object-fit:contain;"></video>`;
     } else {
-        mediaHTML = `<img src="${currentMedia.url}" alt="Zoom" style="max-width:100%;max-height:90vh;object-fit:contain;">`;
+    mediaHTML = `<img src="${currentMedia.url}" alt="Zoom" style="max-width:100%;max-height:90vh;object-fit:contain;">`;
+}
+
+// Botão WhatsApp no super zoom
+if (currentModalProduct) {
+    const product = currentModalProduct;
+    let whatsappMessage = `Olá! Gostei do produto: *${product.name}* - R$ ${product.price.toFixed(2).replace('.', ',')}`;
+    
+    if (product.tem_solitario && product.solitario_price > 0) {
+        const total = product.price + product.solitario_price;
+        whatsappMessage = `Olá! Gostei do produto: *${product.name}* + *Solitário* (R$ ${product.solitario_price.toFixed(2).replace('.', ',')}) - Total: R$ ${total.toFixed(2).replace('.', ',')}`;
     }
+    
+    whatsappMessage += `. Consegue me entregar hoje?`;
+    
+    mediaHTML += `
+        <a href="https://api.whatsapp.com/send/?phone=5565993337205&text=${encodeURIComponent(whatsappMessage)}" 
+           target="_blank" 
+           class="zoom-whatsapp-btn highlighted">
+           <i class="fab fa-whatsapp"></i> FALAR NO WHATSAPP
+        </a>
+    `;
+}
+
+// Adicionar badge no super zoom
+if (currentZoomIndex === 0 && currentModalProduct) { // Só no primeiro item da lista
+    if (currentModalProduct.badge_text) {
+        mediaHTML += `<div class="super-zoom-badge">${currentModalProduct.badge_text}</div>`;
+    }
+    if (currentModalProduct.sold_today) {
+        mediaHTML += `<div class="super-zoom-sold">Vendido Hoje</div>`;
+    }
+}
     
     content.innerHTML = `
         ${navigationHTML}
@@ -1417,7 +1451,15 @@ function buyViaWhatsApp(id) {
         return;
     }
 
-    const msg = `Olá! Quero este produto: *${p.name}* - R$ ${p.price.toFixed(2).replace('.', ',')}`;
+    let msg = `Olá! Gostei do produto: *${p.name}* - R$ ${p.price.toFixed(2).replace('.', ',')}`;
+    
+    if (p.tem_solitario && p.solitario_price > 0) {
+        const total = p.price + p.solitario_price;
+        msg = `Olá! Gostei do produto: *${p.name}* + *Solitário* (R$ ${p.solitario_price.toFixed(2).replace('.', ',')}) - Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+    }
+    
+    msg += `. Consegue me entregar hoje?`;
+    
     const url = `https://api.whatsapp.com/send/?phone=5565993337205&text=${encodeURIComponent(msg)}&type=phone_number&app_absent=0`;
     window.open(url, '_blank');
 }
