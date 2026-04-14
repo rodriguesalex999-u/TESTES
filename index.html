@@ -3,29 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Teste Supabase</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <h1>Teste de Conexão Supabase</h1>
     <div id="resultado">Carregando...</div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://vnrfmsyanrvqqhmqyixk.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_xGLDFQarl-DhshRW0932FQ_asug0TUK';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        async function testar() {
-            const { data, error } = await supabase.from('products').select('id, name');
+        // Aguardar o script carregar
+        window.addEventListener('load', function() {
+            const SUPABASE_URL = 'https://vnrfmsyanrvqqhmqyixk.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_xGLDFQarl-DhshRW0932FQ_asug0TUK';
             
-            if (error) {
-                document.getElementById('resultado').innerHTML = 'ERRO: ' + error.message;
-            } else {
-                document.getElementById('resultado').innerHTML = '✅ CONECTADO! Produtos encontrados: ' + data.length;
-                console.log('Produtos:', data);
+            // Verificar se supabase existe
+            if (typeof supabase === 'undefined') {
+                document.getElementById('resultado').innerHTML = '❌ ERRO: Supabase não carregou!';
+                return;
             }
-        }
-        
-        testar();
+            
+            const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            client.from('products').select('id, name').limit(5)
+                .then(result => {
+                    if (result.error) {
+                        document.getElementById('resultado').innerHTML = '❌ ERRO: ' + result.error.message;
+                    } else {
+                        document.getElementById('resultado').innerHTML = '✅ CONECTADO! Produtos encontrados: ' + result.data.length + '<br><br>Produtos: ' + JSON.stringify(result.data);
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('resultado').innerHTML = '❌ ERRO CATCH: ' + err.message;
+                });
+        });
     </script>
 </body>
 </html>
