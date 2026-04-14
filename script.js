@@ -647,13 +647,17 @@ function setupModalMediaClick() {
         const threshold = 50; // Sensibilidade do deslize
         if (touchEndX < touchStartX - threshold) {
             // Deslizou para a esquerda -> Próxima foto
-            const nextIndex = (currentMediaIndex + 1) % currentMediaList.length;
-            changeModalMedia(nextIndex);
+            if (currentMediaList.length > 1) {
+                const nextIndex = (currentMediaIndex + 1) % currentMediaList.length;
+                changeModalMedia(nextIndex);
+            }
         }
         if (touchEndX > touchStartX + threshold) {
             // Deslizou para a direita -> Foto anterior
-            const prevIndex = (currentMediaIndex - 1 + currentMediaList.length) % currentMediaList.length;
-            changeModalMedia(prevIndex);
+            if (currentMediaList.length > 1) {
+                const prevIndex = (currentMediaIndex - 1 + currentMediaList.length) % currentMediaList.length;
+                changeModalMedia(prevIndex);
+            }
         }
     }
 }
