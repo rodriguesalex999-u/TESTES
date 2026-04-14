@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Teste - Vitrine de Produtos</title>
+    <style>
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+        .product-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .product-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .product-price {
+            color: #D4AF37;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teste - Vitrine de Produtos</h1>
+    <div id="productsContainer" class="products-grid">Carregando...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script-teste.js"></script>
+</body>
+</html>
